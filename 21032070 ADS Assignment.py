@@ -14,14 +14,16 @@ import err_ranges as err
 
 
 
-#Load the data into a pandas dataframe
 filename = 'API_SP.POP.GROW_DS2_en_csv_v2_4770493.csv'
 indicator = 'Population growth (annual %)'
 year1 = '1980'
 year2 = '2019'
 
+#Load the data into a pandas dataframe
 df = pd.read_csv(filename, skiprows=4)
 df = df.loc[df['Indicator Name'] == indicator]
+df.head(5)
+
 
 #extract the required data for the clustering\n",
 df_cluster = df.loc[df.index, ['Country Name', year1, year2]]
@@ -29,6 +31,7 @@ df_cluster = df.loc[df.index, ['Country Name', year1, year2]]
 #convert the datafram to an array\n",
 x = df_cluster[[year1, year2]].dropna().values
 print(x)
+
 
 #Plot a graph and get the elbow of the graph
 sse = []
@@ -38,6 +41,10 @@ for i in range(1, 11):
     sse.append(kmeans.inertia_)
 plt.plot(range(1, 11), sse)
 plt.savefig('clusters.png')
+#To visualize the numbee ofclusters we will be working with
+plt.title('A Graph to get the elbow of the cluster')
+plt.xlabel('X-Axis')
+plt.ylabel('Y-Axis')
 plt.show()
 
 #create a scatter plot to visualize the cluster
@@ -50,12 +57,14 @@ print(y_kmeans)
 y = kmeans.cluster_centers_
 print(y)
 
-#create the scatter pot for the y_kmeans and show the cluster centers on the plot
+
+#create the scatter plot for the y_kmeans and show the cluster centers on the plot
 plt.scatter(x[y_kmeans == 0, 0], x[y_kmeans == 0, 1], s = 50, c = 'purple',label = 'label 0')
 plt.scatter(x[y_kmeans == 1, 0], x[y_kmeans == 1, 1], s = 50, c = 'orange',label = 'label 1')
 plt.scatter(x[y_kmeans == 2, 0], x[y_kmeans == 2, 1], s = 50, c = 'green',label = 'label 2')
 plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:,1], s = 10, c = 'red', label = 'Centroids')
 plt.legend()
+plt.title('A Scatter Plot showing the y_kmeans and the cluster centers')
 plt.show()
 
 #Define the function to fit:loworder polynomial
@@ -94,15 +103,14 @@ df_year = df_year.drop(index=df_year.index[0], axis=0)
 df_year['Year'] = df_year.index
 print(df_year.index)
 
-
+print(df_year)
 df_fitting = df_year[['Year', 'Argentina']].apply(pd.to_numeric, errors='coerce')
 m = df_fitting.dropna().values
 print(m)
 x_axis = m[:,0]
 y_axis = m[:,1]
-
-#x_axis y_axis = m[:,0], m[:,1]
-
+print(m)
+#Using the curve_fit function to fit the low order polynomial
 popt, _ = opt.curve_fit(model, x_axis, y_axis)
 param, covar = opt.curve_fit(model, x_axis, y_axis)
 a, b, c, d = popt
@@ -110,9 +118,14 @@ print(popt)
  
 sigma = np.sqrt(np.diag(covar))
 low, up = err.err_ranges(m, model, popt, sigma)
+#Calculates the upper and lower limits for the function, parameters and sigmas
+#for single value or array x.
 
-
+#Create a scatter plot to to show the clusters for Argentina
 plt.scatter(x_axis, y_axis)
+plt.xlabel('Year')
+plt.ylabel('Values')
+
 
 x_line = np.arange(min(m[:,0]), max(m[:,0])+1, 1)
 y_line = model(x_line, a, b, c, d)
