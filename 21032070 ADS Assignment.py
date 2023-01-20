@@ -33,7 +33,7 @@ x = df_cluster[[year1, year2]].dropna().values
 print(x)
 
 
-#Plot a graph and get the elbow of the graph
+#Create a line plot and get the elbow of the graph to determine the number of clusters to use
 sse = []
 for i in range(1, 11):
     kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
@@ -42,7 +42,7 @@ for i in range(1, 11):
 plt.plot(range(1, 11), sse)
 plt.savefig('clusters.png')
 #To visualize the numbee ofclusters we will be working with
-plt.title('A Graph to get the elbow of the cluster')
+plt.title('A Line Plot showing the elbow of the cluster')
 plt.xlabel('X-Axis')
 plt.ylabel('Y-Axis')
 plt.show()
@@ -102,14 +102,16 @@ df_year = df_year.rename(columns=df_year.iloc[0])
 df_year = df_year.drop(index=df_year.index[0], axis=0)
 df_year['Year'] = df_year.index
 print(df_year.index)
-
 print(df_year)
+
+#
 df_fitting = df_year[['Year', 'Argentina']].apply(pd.to_numeric, errors='coerce')
 m = df_fitting.dropna().values
-print(m)
 x_axis = m[:,0]
 y_axis = m[:,1]
 print(m)
+
+
 #Using the curve_fit function to fit the low order polynomial
 popt, _ = opt.curve_fit(model, x_axis, y_axis)
 param, covar = opt.curve_fit(model, x_axis, y_axis)
